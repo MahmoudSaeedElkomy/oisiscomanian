@@ -1,0 +1,363 @@
+# Query: 
+# ContextLines: 1
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>رفيقي في الواحة: مرشدك الشخصي</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Desert Sands & Papyrus with inviting accents -->
+    <!-- Application Structure Plan: A single-page application focused on a chatbot interface for international students. It features a main chat window for user input and AI responses, quick-access buttons for common topics, and a "Daily Tip from the Oasis" section. Discreet audio controls for ambient sounds. The design prioritizes ease of use and a welcoming feel. -->
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #FDF8F0;
+            color: #4E4234;
+        }
+        .bg-primary { background-color: #FDF8F0; }
+        .bg-secondary { background-color: #F5EFE1; }
+        .text-primary { color: #4E4234; }
+        .text-accent { color: #8D6B4C; }
+        .bg-accent { background-color: #D4A056; }
+        .bg-accent-hover:hover { background-color: #C08C3B; }
+        .shadow-custom { 
+            box-shadow: 0 10px 30px -5px rgba(141, 107, 76, 0.15), 0 6px 12px -6px rgba(141, 107, 76, 0.1); 
+        }
+        .text-shadow-light {
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #D4A056;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .chat-message {
+            max-width: 80%;
+            padding: 10px 15px;
+            border-radius: 15px;
+            margin-bottom: 10px;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: #D4A056;
+            color: #FFFFFF;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+        .ai-message {
+            background-color: #E0E7EB; /* Lighter grey-blue for AI */
+            color: #4E4234;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+        .chat-container {
+            height: 60vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            background-color: #FDF8F0;
+            border-radius: 0.75rem;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-primary">
+    <nav class="sticky top-0 z-50 bg-primary/80 backdrop-blur-md shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-accent text-shadow-light">رفيقي في الواحة</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="min-h-screen flex flex-col items-center justify-center p-4 py-16">
+        <div class="max-w-4xl w-full bg-secondary p-8 rounded-xl shadow-custom">
+            <h1 class="text-3xl font-bold text-accent text-center mb-6 text-shadow-light">مرشدك الشخصي لمدينة الإسماعيلية</h1>
+            <p class="text-primary text-center mb-8">مرحباً بك في واحتنا! أنا رفيقك الافتراضي، هنا لمساعدتك في كل ما تحتاج معرفته عن الحياة في الإسماعيلية. اسألني أي شيء يخطر ببالك!</p>
+            
+            <div class="chat-container" id="chat-messages">
+                <!-- Initial AI welcome message -->
+                <div class="chat-message ai-message animate-fadeIn">
+                    أهلاً بك في واحة العلم، الإسماعيلية! أنا هنا لأجعل إقامتك مريحة ومليئة بالذكريات الجميلة. لا تتردد في سؤالي عن أي شيء، سواء عن الأمان، الأماكن، أو كيفية الاندماج في المجتمع. كيف يمكنني مساعدتك اليوم؟ 😊
+                </div>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <button class="quick-prompt-btn bg-accent text-white font-bold py-2 px-4 rounded-full text-sm bg-accent-hover transition-all duration-200">
+                    الأمان والمعيشة 🛡️
+                </button>
+                <button class="quick-prompt-btn bg-accent text-white font-bold py-2 px-4 rounded-full text-sm bg-accent-hover transition-all duration-200">
+                    الاندماج والمجتمع 🤝
+                </button>
+                <button class="quick-prompt-btn bg-accent text-white font-bold py-2 px-4 rounded-full text-sm bg-accent-hover transition-all duration-200">
+                    أماكن للزيارة 🗺️
+                </button>
+                <button class="quick-prompt-btn bg-accent text-white font-bold py-2 px-4 rounded-full text-sm bg-accent-hover transition-all duration-200">
+                    نصائح للطلاب الجدد 🎓
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+                <input type="text" id="user-input" class="flex-grow p-3 text-primary bg-primary rounded-lg border-2 border-accent/30 focus:outline-none focus:border-accent shadow-inner" placeholder="اكتب سؤالك هنا...">
+                <button id="send-btn" class="bg-accent text-white font-bold py-3 px-6 rounded-full text-lg bg-accent-hover transition-all duration-300 transform hover:scale-105">
+                    إرسال
+                </button>
+            </div>
+
+            <div id="daily-tip-area" class="mt-8 p-4 bg-primary rounded-lg shadow-inner text-primary text-center">
+                <h3 class="font-bold text-accent mb-2">نصيحة اليوم من الواحة ✨</h3>
+                <!-- Moved spinner out of p tag to prevent it being overwritten -->
+                <div id="daily-tip-spinner" class="loading-spinner"></div> 
+                <p id="daily-tip-text" class="leading-relaxed">جارٍ تحميل نصيحة اليوم...</p>
+            </div>
+            
+            <p class="mt-8 text-sm text-center text-primary/70">
+                **ملاحظة هامة للخصوصية:** محادثاتك لا يتم حفظها على الخوادم. رفيقك الافتراضي يعالج المعلومات لحظياً لمساعدتك، وخصوصيتك هي أولويتنا القصوى.
+            </p>
+        </div>
+
+        <div class="fixed bottom-4 left-4 bg-secondary p-3 rounded-full shadow-lg flex items-center space-x-2 z-50">
+            <button id="toggle-music" class="text-accent text-xl focus:outline-none">
+                🎶
+            </button>
+            <button id="toggle-ambient-sound" class="text-accent text-xl focus:outline-none">
+                🍃
+            </button>
+        </div>
+    </main>
+
+    <script>
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const quickPromptBtns = document.querySelectorAll('.quick-prompt-btn');
+        const dailyTipText = document.getElementById('daily-tip-text');
+        const dailyTipSpinner = document.getElementById('daily-tip-spinner'); // Corrected reference
+        const toggleMusicBtn = document.getElementById('toggle-music');
+        const toggleAmbientSoundBtn = document.getElementById('toggle-ambient-sound');
+
+        let chatHistory = [{ role: "model", parts: [{ text: "أهلاً بك في واحة العلم، الإسماعيلية! أنا هنا لأجعل إقامتك مريحة ومليئة بالذكريات الجميلة. لا تتردد في سؤالي عن أي شيء، سواء عن الأمان، الأماكن، أو كيفية الاندماج في المجتمع. كيف يمكنني مساعدتك اليوم؟ 😊" }] }];
+
+        // Tone.js setup for ambient sounds (No background music for now, focus on ambient)
+        let ambientSynth = new Tone.NoiseSynth({
+            envelope: {
+                attack: 0.05,
+                decay: 0.5,
+                sustain: 0.5,
+                release: 1
+            }
+        }).toDestination();
+        ambientSynth.volume.value = -30;
+        let ambientNoiseLoop;
+        let isAmbientSoundPlaying = false;
+
+        function startAmbientSound(type = 'wind') {
+            if (!ambientNoiseLoop) {
+                ambientNoiseLoop = new Tone.Loop(time => {
+                    if (type === 'wind') {
+                        ambientSynth.triggerAttackRelease("4n", time, Math.random() * 0.2 + 0.8);
+                    } else if (type === 'water') {
+                        ambientSynth.triggerAttackRelease("8n", time, Math.random() * 0.1 + 0.9);
+                    } else if (type === 'city') {
+                        ambientSynth.triggerAttackRelease("16n", time, Math.random() * 0.05 + 0.95);
+                    } else if (type === 'birds') {
+                        ambientSynth.triggerAttackRelease("16n", time, Math.random() * 0.1 + 0.9);
+                    }
+                }, "1n").start(0);
+            }
+            Tone.Transport.start();
+            isAmbientSoundPlaying = true;
+            toggleAmbientSoundBtn.textContent = '🍃';
+        }
+
+        function stopAmbientSound() {
+            if (ambientNoiseLoop) {
+                ambientNoiseLoop.stop();
+                ambientNoiseLoop = null;
+            }
+            Tone.Transport.stop(); // Stop Tone.js transport for both loops
+            Tone.Transport.cancel(); // Clear all scheduled events
+            isAmbientSoundPlaying = false;
+            toggleAmbientSoundBtn.textContent = '🔇';
+        }
+
+        toggleAmbientSoundBtn.addEventListener('click', async () => {
+            await Tone.start();
+            if (isAmbientSoundPlaying) {
+                stopAmbientSound();
+            } else {
+                startAmbientSound('wind'); // Default ambient sound
+            }
+        });
+
+        // Background music toggle (retained but initially off, can be developed further)
+        let backgroundSynth = new Tone.PolySynth(Tone.Synth, {
+            oscillator: { type: "sine" },
+            envelope: { attack: 3, decay: 1, sustain: 0.7, release: 5 }
+        }).toDestination();
+        backgroundSynth.volume.value = -18;
+        let musicLoop;
+        let isMusicPlaying = false;
+
+        function startMusic() {
+            if (!musicLoop) {
+                const chords = [
+                    ["C4", "E4", "G4"], ["F4", "A4", "C5"], ["G4", "B4", "D5"], ["A3", "C4", "E4"]
+                ];
+                let chordIndex = 0;
+                musicLoop = new Tone.Loop(time => {
+                    backgroundSynth.triggerAttackRelease(chords[chordIndex % chords.length], "4n", time);
+                    chordIndex++;
+                }, "2n").start(0);
+            }
+            Tone.Transport.start();
+            isMusicPlaying = true;
+            toggleMusicBtn.textContent = '🎶';
+        }
+
+        function stopMusic() {
+            Tone.Transport.stop();
+            Tone.Transport.cancel();
+            backgroundSynth.releaseAll();
+            musicLoop = null;
+            isMusicPlaying = false;
+            toggleMusicBtn.textContent = '🔇';
+        }
+
+        toggleMusicBtn.addEventListener('click', async () => {
+            await Tone.start();
+            if (isMusicPlaying) {
+                stopMusic();
+            } else {
+                startMusic();
+            }
+        });
+
+
+        // Function to display messages in the chat window
+        function displayMessage(role, text) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', role === 'user' ? 'user-message' : 'ai-message', 'animate-fadeIn');
+            messageDiv.innerHTML = text; // Use innerHTML to allow spinner to be rendered
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Scroll to bottom
+        }
+
+        // Gemini API call function
+        async function callGeminiAPI(prompt, isDailyTip = false) {
+            let currentHistory = [...chatHistory];
+            if (isDailyTip) {
+                // For daily tips, we don't need the full chat history
+                currentHistory = [{ role: "user", parts: [{ text: prompt }] }];
+            } else {
+                currentHistory.push({ role: "user", parts: [{ text: prompt }] });
+            }
+
+            // Display loading spinner in chat or daily tip area
+            if (!isDailyTip) {
+                displayMessage('ai', '<div class="loading-spinner"></div>');
+                // The spinner is already part of the message div, no need to add flex items-center
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                dailyTipSpinner.classList.remove('hidden');
+                dailyTipText.textContent = 'جارٍ تحميل نصيحة اليوم...'; // Show placeholder text
+            }
+
+            const apiKey = "AIzaSyBt3W-fHQ-PPQBTPNlvKrC-XdVt_hz97QI"; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const payload = { contents: currentHistory };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+                let aiResponseContent = 'تعذر توليد الرد. حاول مرة أخرى.';
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    aiResponseContent = result.candidates[0].content.parts[0].text;
+                }
+
+                if (!isDailyTip) {
+                    // Remove spinner message by directly updating the last message
+                    chatMessages.lastChild.innerHTML = aiResponseContent;
+                    chatHistory.push({ role: "model", parts: [{ text: aiResponseContent }] });
+                } else {
+                    dailyTipText.textContent = aiResponseContent;
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                if (!isDailyTip) {
+                    chatMessages.lastChild.innerHTML = 'حدث خطأ أثناء الاتصال بالنموذج. حاول مرة أخرى.';
+                } else {
+                    dailyTipText.textContent = 'حدث خطأ أثناء تحميل النصيحة.';
+                }
+            } finally {
+                if (isDailyTip) {
+                    dailyTipSpinner.classList.add('hidden');
+                }
+            }
+        }
+
+        // Send message functionality
+        sendBtn.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                displayMessage('user', message);
+                callGeminiAPI(message);
+                userInput.value = '';
+            }
+        });
+
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendBtn.click();
+            }
+        });
+
+        // Quick prompt buttons
+        quickPromptBtns.forEach(button => {
+            button.addEventListener('click', () => {
+                const promptText = button.textContent.trim();
+                displayMessage('user', promptText);
+                callGeminiAPI(promptText);
+            });
+        });
+
+        // Generate Daily Tip on load
+        window.onload = function() {
+            // Initial call to hide spinner and load tip
+            dailyTipSpinner.classList.remove('hidden'); // Ensure spinner is visible initially
+            dailyTipText.textContent = 'جارٍ تحميل نصيحة اليوم...'; // Initial loading text
+            callGeminiAPI("اكتب نصيحة يومية قصيرة ودافئة لطالب وافد جديد في الإسماعيلية، تركز على جانب إنساني (مثل الاندماج، الاستكشاف، التغلب على الغربة، الاستمتاع بالمدينة)، بأسلوب ودود ومُرحب، وكأنها من 'رفيق في الواحة'. لا تتجاوز 40 كلمة.", true); // true for daily tip
+            // Ensure audio context is started on first user interaction, not onload
+        };
+    </script>
+</body>
+</html>
